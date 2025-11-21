@@ -1,0 +1,20 @@
+<table>
+    <thead>
+    <tr>
+        <th (click)="sortBy('name')">Nome</th>
+        <th (click)="sortBy('workingSet')">Working Set</th>
+        <th (click)="sortBy('hardFaults')">Hard Fault/s</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr 
+        *ngFor="let p of sortedProcesses()"
+        (click)="store.select(p.pid)"
+    >
+        <td>{{ p.name }}</td>
+        <td>{{ p.workingSet | number }} KB</td>
+        <td>{{ p.hardFaults }}</td>
+    </tr>
+    </tbody>
+</table>
