@@ -1,27 +1,29 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <title>Processos em tempo real</title>
     <style>
-      body {
-        font-family: monospace;
-        padding: 20px;
-        background: #111;
-        color: #eee;
-      }
-      #out {
-        white-space: pre;
-        background: #222;
-        padding: 15px;
-        border-radius: 8px;
-        overflow: auto;
-        max-height: 90vh;
-      }
-    </style>
-  </head>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #111;
+            color: #eee;
+        }
 
-  <body>
+        #out {
+            white-space: pre;
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            overflow: auto;
+            max-height: 90vh;
+        }
+    </style>
+</head>
+
+<body>
     <h2>Processos sendo monitorados</h2>
 
     <pre id="out">Conectando...</pre>
@@ -39,88 +41,87 @@
     <button onclick="killProcess()">Matar processo</button>
 
     <script>
-      const ws = new WebSocket("ws://127.0.0.1:8080/ws");
+        const ws = new WebSocket("ws://127.0.0.1:8080/ws");
 
-      ws.onopen = () => {
-        document.getElementById("out").textContent = "Aguardando dados...";
-        console.log("WS conectado");
-      };
+        ws.onopen = () => {
+            document.getElementById("out").textContent = "Aguardando dados...";
+            console.log("WS conectado");
+        };
 
-      ws.onmessage = (event) => {
-        try {
-          const json = JSON.parse(event.data);
-          document.getElementById("out").textContent = JSON.stringify(
-            json,
-            null,
-            2
-          );
-        } catch (e) {
-          document.getElementById("out").textContent =
-            "Erro ao parsear JSON: " + e + "\nRaw: " + event.data;
-        }
-      };
+        ws.onmessage = (event) => {
+            try {
+                const json = JSON.parse(event.data);
+                document.getElementById("out").textContent = JSON.stringify(
+                    json,
+                    null,
+                    2
+                );
+            } catch (e) {
+                document.getElementById("out").textContent =
+                    "Erro ao parsear JSON: " + e + "\nRaw: " + event.data;
+            }
+        };
 
-      ws.onerror = (err) => {
-        document.getElementById("out").textContent = "Erro WebSocket: " + err;
-      };
+        ws.onerror = (err) => {
+            document.getElementById("out").textContent = "Erro WebSocket: " + err;
+        };
 
-      ws.onclose = () => {
-        document.getElementById("out").textContent = "Conexão fechada.";
-      };
+        ws.onclose = () => {
+            document.getElementById("out").textContent = "Conexão fechada.";
+        };
 
-      // 🔥 Envia o limite para o backend
-      function sendLimit() {
-        const limit = document.getElementById("limit").value;
+        function sendLimit() {
+            const limit = document.getElementById("limit").value;
 
-        ws.send(
-          JSON.stringify({
-            working_set_limit: limit === "" ? null : Number(limit),
-          })
-        );
+            ws.send(
+                JSON.stringify({
+                    working_set_limit: limit === "" ? null : Number(limit),
+                })
+            );
 
-        console.log("Enviado para backend:", limit);
-      }
-
-      function clearWorkingSet() {
-        const pid = document.getElementById("pid_clear").value;
-
-        if (!pid) {
-          alert("Digite um PID válido!");
-          return;
+            console.log("Enviado para backend:", limit);
         }
 
-        fetch(`http://127.0.0.1:8080/clear/${pid}`)
-          .then((r) => r.json())
-          .then((data) => {
-            console.log("Resposta do servidor:", data);
-            console.log("Resposta: " + JSON.stringify(data, null, 2));
-          })
-          .catch((err) => {
-            console.error("Erro:", err);
-            console.log("Erro ao chamar API: " + err);
-          });
-      }
+        function clearWorkingSet() {
+            const pid = document.getElementById("pid_clear").value;
 
-      // 🔥 CHAMA /terminate/{pid}
-      function killProcess() {
-        const pid = document.getElementById("pid").value;
+            if (!pid) {
+                alert("Digite um PID válido!");
+                return;
+            }
 
-        if (!pid) {
-          alert("Digite um PID válido!");
-          return;
+            fetch(`http://127.0.0.1:8080/clear/${pid}`)
+                .then((r) => r.json())
+                .then((data) => {
+                    console.log("Resposta do servidor:", data);
+                    console.log("Resposta: " + JSON.stringify(data, null, 2));
+                })
+                .catch((err) => {
+                    console.error("Erro:", err);
+                    console.log("Erro ao chamar API: " + err);
+                });
         }
 
-        fetch(`http://127.0.0.1:8080/terminate/${pid}`)
-          .then((r) => r.json())
-          .then((data) => {
-            console.log("Resposta do servidor:", data);
-            console.log("Resposta: " + JSON.stringify(data));
-          })
-          .catch((err) => {
-            console.error("Erro:", err);
-            alert("Erro ao chamar API: " + err);
-          });
-      }
+        function killProcess() {
+            const pid = document.getElementById("pid").value;
+
+            if (!pid) {
+                alert("Digite um PID válido!");
+                return;
+            }
+
+            fetch(`http://127.0.0.1:8080/terminate/${pid}`)
+                .then((r) => r.json())
+                .then((data) => {
+                    console.log("Resposta do servidor:", data);
+                    console.log("Resposta: " + JSON.stringify(data));
+                })
+                .catch((err) => {
+                    console.error("Erro:", err);
+                    alert("Erro ao chamar API: " + err);
+                });
+        }
     </script>
-  </body>
+</body>
+
 </html>

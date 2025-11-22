@@ -20,6 +20,7 @@ pub struct ProcessList {
     pub thread_total: u32,
     pub working_set_sizes_kb_total: usize,
     pub working_set_sizes_gb_total: f64,
+    pub total_cleaned: Vec<usize>,
     pub processes: Vec<ProcessInfo>,
 }
 
