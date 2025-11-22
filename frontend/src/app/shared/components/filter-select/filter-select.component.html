@@ -1,0 +1,17 @@
+<div class="select-container">
+  <div class="select-display" (click)="toggle()">
+    <span class="label">{{ selectedLabel() }}</span>
+    <span class="arrow" [class.open]="isOpen()">▾</span>
+  </div>
+
+  <div class="options" *ngIf="isOpen()">
+    <div
+      class="option"
+      *ngFor="let opt of options"
+      [class.active]="opt.value === internalValue()"
+      (click)="select(opt)"
+    >
+      {{ opt.label }}
+    </div>
+  </div>
+</div>

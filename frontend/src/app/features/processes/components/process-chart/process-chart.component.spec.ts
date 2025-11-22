@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WorkingSetChartComponent } from './working-set-chart.component';
+import { ProcessChartComponent } from './process-chart.component';
 
-describe('WorkingSetChartComponent', () => {
-  let component: WorkingSetChartComponent;
-  let fixture: ComponentFixture<WorkingSetChartComponent>;
+describe('ProcessChartComponent', () => {
+  let component: ProcessChartComponent;
+  let fixture: ComponentFixture<ProcessChartComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [WorkingSetChartComponent]
+      imports: [ProcessChartComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(WorkingSetChartComponent);
+    fixture = TestBed.createComponent(ProcessChartComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

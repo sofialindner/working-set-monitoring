@@ -1,1 +1,35 @@
-<p>process-details works!</p>
+<div class="process-details card" *ngIf="store.selectedProcess() as proc">
+    <div class="row-between">
+        <h2>{{ proc.name }}</h2>
+        <span class="tag">PID {{ proc.pid }}</span>
+    </div>
+    <hr>
+
+    <div class="process-info">
+        <div class="row-between">
+            <span class="label">Working Set Size</span>
+            <span>{{ proc.working_set_size| number }} KB</span>
+        </div>
+        <div class="row-between">
+            <span class="label">Peak Working Set Size</span>
+            <span>{{ proc.peak_working_set_size | number }} KB</span>
+        </div>
+        <div class="row-between">
+            <span class="label">Page Fault</span>
+            <span>{{ proc.page_fault_count }}</span>
+        </div>
+    </div>
+
+    <app-process-chart/>
+
+        <div class="action-buttons">
+        <button class="btn-ghost">
+            <span class="material-symbols-outlined">stop_circle</span>
+            Encerrar
+        </button>
+        <button class="btn-tonal">
+            <span class="material-symbols-outlined">delete</span>
+            Limpar working set
+        </button>
+    </div>
+</div>

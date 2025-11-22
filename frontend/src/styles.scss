@@ -1,3 +1,88 @@
 * {
-  font-family: 'Ubuntu Sans Mono', sans-serif;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--text-color);
+  margin: 0;
+}
+
+body {
+  background: var(--bg-color);
+  height: 100vh;
+  width: 100vw;
+}
+
+:root {
+  --bg-color: rgb(18, 21, 28);
+  --secondary-color: rgb(82, 213, 82);
+  --secondary-color-20: rgba(82, 213, 82, 0.2);
+  --primary-color: rgb(0, 171, 140);
+  --primary-color-20: rgba(0, 171, 140, 0.2);
+  --text-color: white;
+  --text-color-50: rgba(255, 255, 255, 0.5);
+  --text-color-20: rgba(255, 255, 255, 0.2);
+  --text-color-10: rgba(255, 255, 255, 0.1);
+  --text-color-5: rgba(255, 255, 255, 0.05);
+  --card-color: rgb(24, 27, 37);
+  --card-radius: 16px;
+  --card-padding: 20px;
+}
+
+.row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card {
+  background: var(--card-color);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+}
+
+.tag {
+  background-color: var(--secondary-color-20);
+  color: var(--secondary-color);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+button {
+  outline: none;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: fit-content;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  span.material-symbols-outlined {
+    color: inherit;
+  }
+}
+
+.btn-ghost {
+  background: var(--text-color-5);
+  color: var(--text-color);
+
+  &:hover {
+    background: var(--text-color-10);
+  }
+}
+
+.btn-tonal {
+  background: var(--primary-color-20);
+  color: var(--primary-color);
+
+  &:hover {
+    filter: brightness(110%);
+  }
 }

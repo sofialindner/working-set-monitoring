@@ -1,20 +1,50 @@
-<table>
-    <thead>
-    <tr>
-        <th (click)="sortBy('name')">Nome</th>
-        <th (click)="sortBy('workingSet')">Working Set</th>
-        <th (click)="sortBy('hardFaults')">Hard Fault/s</th>
-    </tr>
-    </thead>
+<div class="table-wrapper">
+  <div class="row-between">
+    <div class="title">
+        <h3>Processos Ativos</h3>
+        <p>Processos em execução no SO. Clique no processo para ver detalhes.</p>
+    </div>
+    <app-filter-select
+        [ngModel]="orderBy()"
+        (ngModelChange)="orderBy.set($event)"
+        [options]="[
+        { label: 'PID', value: 'pid' },
+        { label: 'Working Set', value: 'working_set_size' },
+        { label: 'Page Faults', value: 'page_fault_count' },
+        { label: 'Pages', value: 'pages' },
+        { label: 'Peak W. Set Size', value: 'peak_working_set_size' },
+        ]"
+        placeholder="Ordenar por..."
+    ></app-filter-select>
+  </div>
+  <br>
 
-    <tbody>
-    <tr 
-        *ngFor="let p of sortedProcesses()"
-        (click)="store.select(p.pid)"
-    >
-        <td>{{ p.name }}</td>
-        <td>{{ p.workingSet | number }} KB</td>
-        <td>{{ p.hardFaults }}</td>
-    </tr>
-    </tbody>
-</table>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th (click)="sortBy('pid')">PID</th>
+          <th (click)="sortBy('name')">Nome</th>
+          <th (click)="sortBy('working_set_size')">Working Set</th>
+          <th (click)="sortBy('page_fault_count')">Page Fault</th>
+          <th (click)="sortBy('pages')">Pages</th>
+          <th (click)="sortBy('peak_working_set_size')">Peak W. Set Size</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="let p of sortedProcesses(); let i = index"
+          (click)="store.select(p.pid)"
+        >
+          <td>{{ p.pid }}</td>
+          <td>{{ p.name }}</td>
+          <td>{{ p.working_set_size | number }} KB</td>
+          <td>{{ p.page_fault_count }}</td>
+          <td>{{ p.pages }}</td>
+          <td>{{ p.peak_working_set_size }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

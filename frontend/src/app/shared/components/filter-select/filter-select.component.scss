@@ -1,0 +1,48 @@
+.select-container {
+  position: relative;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.select-display {
+  padding: 12px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--text-color-10);
+  background: transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.arrow {
+  transition: transform 0.2s ease;
+}
+
+.arrow.open {
+  transform: rotate(180deg);
+}
+
+.options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  border: 1px solid var(--text-color-10);
+  background: var(--bg-color);
+  border-radius: 8px;
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.option {
+  padding: 12px 12px;
+  transition: background 0.3s ease;
+}
+
+.option:hover,
+.option.active {
+  background: var(--text-color-10);
+}

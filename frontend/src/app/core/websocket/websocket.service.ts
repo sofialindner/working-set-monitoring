@@ -7,7 +7,8 @@ export class WebSocketService {
   message = signal<any | null>(null);
 
   connect() {
-    this.socket = new WebSocket('ws://localhost:9000/ws');
+    this.socket = new WebSocket('ws://localhost:8080/ws');
+    console.log("conectei");
 
     this.socket.onmessage = (ev) => {
       const data = JSON.parse(ev.data);
