@@ -11,10 +11,16 @@ pub struct ProcessInfo {
     pub pages: usize,
     pub page_fault_count: u32,
     pub page_file_usage: usize,
+    pub thread_count: u32
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct ProcessList {
     pub total: usize,
     pub processes: Vec<ProcessInfo>,
+}
+
+#[derive(serde::Deserialize)]
+pub struct WsCommand {
+    pub working_set_limit: Option<usize>,
 }

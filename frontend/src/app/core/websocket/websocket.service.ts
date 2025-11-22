@@ -8,7 +8,6 @@ export class WebSocketService {
 
   connect() {
     this.socket = new WebSocket('ws://localhost:8080/ws');
-    console.log("conectei");
 
     this.socket.onmessage = (ev) => {
       const data = JSON.parse(ev.data);
