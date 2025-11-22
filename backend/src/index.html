@@ -1,99 +1,126 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="utf-8" />
     <title>Processos em tempo real</title>
     <style>
-        body {
-            font-family: monospace;
-            padding: 20px;
-            background: #111;
-            color: #eee;
-        }
-        #out {
-            white-space: pre;
-            background: #222;
-            padding: 15px;
-            border-radius: 8px;
-            overflow: auto;
-            max-height: 90vh;
-        }
+      body {
+        font-family: monospace;
+        padding: 20px;
+        background: #111;
+        color: #eee;
+      }
+      #out {
+        white-space: pre;
+        background: #222;
+        padding: 15px;
+        border-radius: 8px;
+        overflow: auto;
+        max-height: 90vh;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <h2>Processos sendo monitorados</h2>
 
     <pre id="out">Conectando...</pre>
 
     <h3>Definir limite de Working Set (KB)</h3>
-    <input id="limit" type="number" placeholder="Limite em KB">
+    <input id="limit" type="number" placeholder="Limite em KB" />
     <button onclick="sendLimit()">Enviar limite</button>
 
+    <h3>Limpar Working Set de um processo</h3>
+    <input id="pid_clear" type="number" placeholder="PID do processo" />
+    <button onclick="clearWorkingSet()">Limpar Working Set</button>
+
     <h3>Matar processo</h3>
-    <input id="pid" type="number" placeholder="PID do processo">
+    <input id="pid" type="number" placeholder="PID do processo" />
     <button onclick="killProcess()">Matar processo</button>
 
-<script>
-    const ws = new WebSocket("ws://127.0.0.1:8080/ws");
+    <script>
+      const ws = new WebSocket("ws://127.0.0.1:8080/ws");
 
-    ws.onopen = () => {
+      ws.onopen = () => {
         document.getElementById("out").textContent = "Aguardando dados...";
         console.log("WS conectado");
-    };
+      };
 
-    ws.onmessage = (event) => {
+      ws.onmessage = (event) => {
         try {
-            const json = JSON.parse(event.data);
-            document.getElementById("out").textContent =
-                JSON.stringify(json, null, 2);
+          const json = JSON.parse(event.data);
+          document.getElementById("out").textContent = JSON.stringify(
+            json,
+            null,
+            2
+          );
         } catch (e) {
-            document.getElementById("out").textContent =
-                "Erro ao parsear JSON: " + e + "\nRaw: " + event.data;
+          document.getElementById("out").textContent =
+            "Erro ao parsear JSON: " + e + "\nRaw: " + event.data;
         }
-    };
+      };
 
-    ws.onerror = (err) => {
-        document.getElementById("out").textContent =
-            "Erro WebSocket: " + err;
-    };
+      ws.onerror = (err) => {
+        document.getElementById("out").textContent = "Erro WebSocket: " + err;
+      };
 
-    ws.onclose = () => {
+      ws.onclose = () => {
         document.getElementById("out").textContent = "Conexão fechada.";
-    };
+      };
 
-    // 🔥 Envia o limite para o backend
-    function sendLimit() {
+      // 🔥 Envia o limite para o backend
+      function sendLimit() {
         const limit = document.getElementById("limit").value;
 
-        ws.send(JSON.stringify({
-            working_set_limit: limit === "" ? null : Number(limit)
-        }));
+        ws.send(
+          JSON.stringify({
+            working_set_limit: limit === "" ? null : Number(limit),
+          })
+        );
 
         console.log("Enviado para backend:", limit);
-    }
+      }
 
-    // 🔥 CHAMA /terminate/{pid}
-    function killProcess() {
+      function clearWorkingSet() {
+        const pid = document.getElementById("pid_clear").value;
+
+        if (!pid) {
+          alert("Digite um PID válido!");
+          return;
+        }
+
+        fetch(`http://127.0.0.1:8080/clear/${pid}`)
+          .then((r) => r.json())
+          .then((data) => {
+            console.log("Resposta do servidor:", data);
+            console.log("Resposta: " + JSON.stringify(data, null, 2));
+          })
+          .catch((err) => {
+            console.error("Erro:", err);
+            console.log("Erro ao chamar API: " + err);
+          });
+      }
+
+      // 🔥 CHAMA /terminate/{pid}
+      function killProcess() {
         const pid = document.getElementById("pid").value;
 
         if (!pid) {
-            alert("Digite um PID válido!");
-            return;
+          alert("Digite um PID válido!");
+          return;
         }
 
         fetch(`http://127.0.0.1:8080/terminate/${pid}`)
-            .then(r => r.json())
-            .then(data => {
-                console.log("Resposta do servidor:", data);
-                console.log("Resposta: " + JSON.stringify(data));
-            })
-            .catch(err => {
-                console.error("Erro:", err);
-                alert("Erro ao chamar API: " + err);
-            });
-    }
-</script>
-
-</body>
+          .then((r) => r.json())
+          .then((data) => {
+            console.log("Resposta do servidor:", data);
+            console.log("Resposta: " + JSON.stringify(data));
+          })
+          .catch((err) => {
+            console.error("Erro:", err);
+            alert("Erro ao chamar API: " + err);
+          });
+      }
+    </script>
+  </body>
 </html>

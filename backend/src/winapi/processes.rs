@@ -32,6 +32,8 @@ unsafe fn get_page_size() -> usize {
 unsafe fn get_processes(page_size: usize) -> Result<ProcessList, String> {
     let mut list = Vec::new();
     let mut index = 0;
+    let mut thread_total: u32= 0;
+    let mut working_set_sizes_kb_total: usize = 0;
 
     let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if snapshot.is_null() || snapshot == -1isize as HANDLE {
@@ -67,11 +69,12 @@ unsafe fn get_processes(page_size: usize) -> Result<ProcessList, String> {
                 size_of::<PROCESS_MEMORY_COUNTERS_EX>() as u32,
             ) != 0
             {
+                let working_set_size_kb = mem.WorkingSetSize / 1024;
                 list.push(ProcessInfo {
                     pid,
                     index,
                     name,
-                    working_set_size: mem.WorkingSetSize / 1024,
+                    working_set_size: working_set_size_kb,
                     private_usage: mem.PrivateUsage / 1024,
                     peak_working_set_size: mem.PeakWorkingSetSize / 1024,
                     pages: mem.WorkingSetSize as usize / page_size,
@@ -80,6 +83,8 @@ unsafe fn get_processes(page_size: usize) -> Result<ProcessList, String> {
                     thread_count: entry.cntThreads,
                 });
 
+                thread_total += entry.cntThreads;
+                working_set_sizes_kb_total += working_set_size_kb;
                 index += 1;
             }
             CloseHandle(h);
@@ -89,11 +94,17 @@ unsafe fn get_processes(page_size: usize) -> Result<ProcessList, String> {
             break;
         }
     }
-
     CloseHandle(snapshot);
+
+    let working_set_sizes_gb_total =
+    working_set_sizes_kb_total as f64 / (1024.0 * 1024.0);
+
     Ok(ProcessList {
         total: list.len(),
         processes: list,
+        thread_total, 
+        working_set_sizes_kb_total,
+        working_set_sizes_gb_total
     })
 }
 
