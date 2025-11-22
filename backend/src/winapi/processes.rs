@@ -1,26 +1,26 @@
 use crate::ProcessInfo;
 use crate::ProcessList;
+use std::{
+    ffi::CStr,
+    mem::{size_of, zeroed, MaybeUninit},
+    os::raw::c_char,
+};
 use windows_sys::Win32::{
     Foundation::{CloseHandle, HANDLE},
     System::{
         Diagnostics::ToolHelp::{
-            CreateToolhelp32Snapshot, PROCESSENTRY32, Process32First, Process32Next,
-            TH32CS_SNAPPROCESS
+            CreateToolhelp32Snapshot, Process32First, Process32Next, PROCESSENTRY32,
+            TH32CS_SNAPPROCESS,
         },
         ProcessStatus::{
-            GetProcessMemoryInfo,
-            PROCESS_MEMORY_COUNTERS,
-            PROCESS_MEMORY_COUNTERS_EX
+            GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS, PROCESS_MEMORY_COUNTERS_EX,
         },
         SystemInformation::{GetSystemInfo, SYSTEM_INFO},
-        Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ, PROCESS_SET_QUOTA},
+        Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_SET_QUOTA, PROCESS_VM_READ, TerminateProcess, PROCESS_TERMINATE},
     },
 };
-use std::{
-    ffi::CStr,
-    mem::{zeroed, MaybeUninit, size_of},
-    os::raw::c_char,
-};
+
+
 
 unsafe fn get_page_size() -> usize {
     let mut s: MaybeUninit<SYSTEM_INFO> = MaybeUninit::uninit();
@@ -28,8 +28,6 @@ unsafe fn get_page_size() -> usize {
     let s = s.assume_init();
     s.dwPageSize as usize
 }
-
-
 
 unsafe fn get_processes(page_size: usize) -> Result<ProcessList, String> {
     let mut list = Vec::new();
@@ -79,6 +77,7 @@ unsafe fn get_processes(page_size: usize) -> Result<ProcessList, String> {
                     pages: mem.WorkingSetSize as usize / page_size,
                     page_fault_count: mem.PageFaultCount,
                     page_file_usage: mem.PagefileUsage / 1024,
+                    thread_count: entry.cntThreads,
                 });
 
                 index += 1;
@@ -92,7 +91,31 @@ unsafe fn get_processes(page_size: usize) -> Result<ProcessList, String> {
     }
 
     CloseHandle(snapshot);
-    Ok(ProcessList { total: list.len(), processes: list })
+    Ok(ProcessList {
+        total: list.len(),
+        processes: list,
+    })
+}
+
+pub unsafe fn terminate_process(pid: u32) -> Result<(), String> {
+    let h = OpenProcess(PROCESS_TERMINATE, 0, pid);
+
+    if h.is_null() {
+        return Err(format!("Falha ao abrir processo {}: {}", pid, std::io::Error::last_os_error()));
+    }
+
+    let ok = TerminateProcess(h, 1);
+    CloseHandle(h);
+
+    if ok == 0 {
+        return Err(format!(
+            "Falha ao terminar processo {}: {}",
+            pid,
+            std::io::Error::last_os_error()
+        ));
+    }
+
+    Ok(())
 }
 
 pub fn collect_process_json() -> Result<String, String> {
