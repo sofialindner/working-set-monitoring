@@ -1,7 +1,7 @@
 <div class="table-wrapper">
   <div class="row-between">
-    <div class="title">
-        <h3>Processos Ativos</h3>
+    <div class="title-support-text">
+        <h2>Processos Ativos</h2>
         <p>Processos em execução no SO. Clique no processo para ver detalhes.</p>
     </div>
     <app-filter-select
@@ -9,10 +9,12 @@
         (ngModelChange)="orderBy.set($event)"
         [options]="[
         { label: 'PID', value: 'pid' },
+        { label: 'Nome', value: 'name' },
+        { label: 'Threads', value: 'thread_count' },
         { label: 'Working Set', value: 'working_set_size' },
         { label: 'Page Faults', value: 'page_fault_count' },
         { label: 'Pages', value: 'pages' },
-        { label: 'Peak W. Set Size', value: 'peak_working_set_size' },
+        { label: 'Peak W. Set', value: 'peak_working_set_size' },
         ]"
         placeholder="Ordenar por..."
     ></app-filter-select>
@@ -25,24 +27,27 @@
         <tr>
           <th (click)="sortBy('pid')">PID</th>
           <th (click)="sortBy('name')">Nome</th>
+          <th (click)="sortBy('thread_count')">Threads</th>
           <th (click)="sortBy('working_set_size')">Working Set</th>
+          <th (click)="sortBy('peak_working_set_size')">Peak W. Set</th>
           <th (click)="sortBy('page_fault_count')">Page Fault</th>
           <th (click)="sortBy('pages')">Pages</th>
-          <th (click)="sortBy('peak_working_set_size')">Peak W. Set Size</th>
         </tr>
       </thead>
 
       <tbody>
         <tr
           *ngFor="let p of sortedProcesses(); let i = index"
+          [class.selected]="store.selectedPid() === p.pid"
           (click)="store.select(p.pid)"
         >
           <td>{{ p.pid }}</td>
           <td>{{ p.name }}</td>
+          <td>{{ p.thread_count }}</td>
           <td>{{ p.working_set_size | number }} KB</td>
+          <td>{{ p.peak_working_set_size | number }} KB</td>
           <td>{{ p.page_fault_count }}</td>
           <td>{{ p.pages }}</td>
-          <td>{{ p.peak_working_set_size }}</td>
         </tr>
       </tbody>
     </table>

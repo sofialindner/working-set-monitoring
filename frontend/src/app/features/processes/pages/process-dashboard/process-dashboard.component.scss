@@ -3,6 +3,44 @@
   flex-direction: column;
   align-items: center;
   padding-top: 16px;
+  width: 80vw;
+}
+
+.totals-wrapper {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+
+  .card {
+    width: 100%;
+
+    &:first-child {
+      background: linear-gradient(to bottom right, var(--secondary-color), var(--card-color));
+    }
+  }
+
+  .counter {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+
+    &__value {
+      font-size: 42px;
+      line-height: 0.9;
+      font-weight: 700;
+    }
+
+    &__unit {
+      font-weight: 500;
+      opacity: 0.5;
+    }
+  }
+
+  .card h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
 }
 
 .process-view {

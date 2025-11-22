@@ -1,0 +1,15 @@
+<div class="tabs-wrapper">
+    <div class="tabs">
+        <div 
+            *ngFor="let tab of tabs; let i = index" 
+            class="tab" 
+            [class.active]="active === i"
+            (click)="select(i)"
+        >
+            <span *ngIf="tab.icon" class="icon material-symbols-outlined">{{ tab.icon }}</span>
+            {{ tab.label }}
+        </div>
+    </div>
+</div>
+
+<ng-content></ng-content>

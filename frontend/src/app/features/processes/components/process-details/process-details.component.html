@@ -23,11 +23,11 @@
     <app-process-chart/>
 
         <div class="action-buttons">
-        <button class="btn-ghost">
+        <button class="btn-ghost" (click)="onTerminateProcess(proc.pid)">
             <span class="material-symbols-outlined">stop_circle</span>
             Encerrar
         </button>
-        <button class="btn-tonal">
+        <button class="btn-filled" (click)="onClearWorkingSet(proc.pid)">
             <span class="material-symbols-outlined">delete</span>
             Limpar working set
         </button>

@@ -1,6 +1,42 @@
 <div class="page-container">
-    <div class="process-view">
+  <div class="totals-wrapper">
+    <div class="card">
+      <h3>Total Working Set</h3>
+      <div class="counter">
+        <span class="counter__value">{{ store.totalWorkingSetSize() }}</span>
+        <span class="counter__unit">KB</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Total de Processos</h3>
+      <div class="counter">
+        <span class="counter__value">{{ store.totalProcesses() }}</span>
+        <span class="counter__unit">ativos</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Total de Threads</h3>
+      <div class="counter">
+        <span class="counter__value">{{ store.totalThreads() }}</span>
+        <span class="counter__unit">threads</span>
+      </div>
+    </div>
+  </div>
+
+  <app-tabs
+    [tabs]="tabs"
+    [active]="selectedTab()"
+    (activeChange)="selectTab($event)"
+  >
+    <ng-container [ngSwitch]="selectedTab()">
+      <div *ngSwitchCase="0" class="process-view">
         <app-process-table></app-process-table>
         <app-process-details></app-process-details>
-    </div>
+      </div>
+
+      <div *ngSwitchCase="1">
+        <app-heuristics-panel></app-heuristics-panel>
+      </div>
+    </ng-container>
+  </app-tabs>
 </div>

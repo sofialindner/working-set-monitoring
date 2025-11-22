@@ -1,0 +1,46 @@
+:host {
+  width: 100%;
+}
+
+.tabs-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-block: 12px;
+}
+
+.tabs {
+  display: flex;
+  background: var(--card-color);
+  padding: 6px;
+  border-radius: 12px;
+  gap: 4px;
+  width: fit-content;
+}
+
+.tab {
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text-color-20);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: 0.2s;
+  font-weight: 500;
+
+  &:hover {
+    background: var(--text-color-5);
+    color: var(--text-color-50);
+  }
+}
+
+.tab.active {
+  background: var(--primary-color-10);
+  color: var(--primary-color);
+}
+
+.icon {
+  color: inherit;
+}

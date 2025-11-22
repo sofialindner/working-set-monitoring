@@ -1,0 +1,36 @@
+<div class="card">
+  <div class="title-support-text">
+    <h2>Limpeza Automática de Working Set</h2>
+    <p>
+      Permite aplicar métricas para reduzir o espaço ocupado por working sets na
+      memória RAM.
+    </p>
+  </div>
+  <hr>
+
+  <form>
+    <label for="maxWorkingSetSize"> Tamanho máximo de working set (KB) </label>
+    <div class="field">
+      <input
+        name="maxWorkingSetSize"
+        placeholder="Digite o tamanho limite em KB. Ex: 2000"
+        type="text"
+        mask="0*"
+      />
+      <button class="btn-filled">Aplicar</button>
+    </div>
+  </form>
+
+  <div>
+    <h3 class="title">
+    <span class="material-symbols-outlined">terminal</span>
+        Terminal
+    </h3>
+    <div class="console">
+        <div *ngFor="let log of store.consoleLogs()">
+            <span class="log-type">{{ log.type.toUpperCase() }}:</span>
+            <span>{{ log.message }}</span>
+        </div>
+    </div>
+  </div>
+</div>

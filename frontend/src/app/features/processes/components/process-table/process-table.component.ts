@@ -2,8 +2,8 @@ import { Component, computed, signal } from '@angular/core';
 import { ProcessesStore } from '../../state/processes.store';
 import { CommonModule } from '@angular/common';
 import { ProcessOrderBy } from '../../models/process.model';
-import { FilterSelectComponent } from "../../../../shared/components";
 import { FormsModule } from '@angular/forms';
+import { FilterSelectComponent } from '@shared/components';
 
 @Component({
   standalone: true,

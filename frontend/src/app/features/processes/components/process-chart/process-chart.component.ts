@@ -1,11 +1,10 @@
-import { Component, ElementRef, ViewChild, signal, effect, Input } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import {
   Chart,
   LineController,
   LineElement,
   PointElement,
   LinearScale,
-  TimeSeriesScale,
   CategoryScale,
   Tooltip,
   Legend
@@ -109,20 +108,12 @@ export class ProcessChartComponent {
   private syncChart(metrics: any[]) {
     if (!metrics.length) return;
 
-    if (metrics.length === this.lastLength) return;
-    this.lastLength = metrics.length;
+    const MAX_POINTS = 20;
+    const slice = metrics.slice(-MAX_POINTS);
 
-    const last = metrics[metrics.length - 1];
-
-    this.chart.data.labels!.push("");
-    this.chart.data.datasets[0].data.push(last.working_set_size);
-    this.chart.data.datasets[1].data.push(last.page_fault_count);
-
-    const MAX_POINTS = 200;
-    if (this.chart.data.labels!.length > MAX_POINTS) {
-      this.chart.data.labels!.shift();
-      this.chart.data.datasets.forEach(d => d.data.shift());
-    }
+    this.chart.data.labels = slice.map(() => "");
+    this.chart.data.datasets[0].data = slice.map(m => m.working_set_size);
+    this.chart.data.datasets[1].data = slice.map(m => m.page_fault_count);
 
     this.chart.update('none');
   }

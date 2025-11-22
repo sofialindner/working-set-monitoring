@@ -1,0 +1,11 @@
+    <div class="notification-container">
+      <div
+        class="notification"
+        *ngFor="let n of notifications.list()"
+        [class.success]="n.type === 'success'"
+        [class.error]="n.type === 'error'"
+        [class.info]="n.type === 'info'"
+      >
+        {{ n.text }}
+      </div>
+    </div>

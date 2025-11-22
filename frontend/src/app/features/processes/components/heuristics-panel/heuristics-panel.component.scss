@@ -1,0 +1,26 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.field {
+  display: flex;
+  gap: 8px;
+}
+
+input {
+  max-width: 20rem;
+}
+
+button {
+  width: fit-content;
+}
+
+.console {
+  font-family: 'Ubuntu Mono', sans-serif;
+  background: var(--bg-color);
+  padding: var(--card-padding);
+  border-radius: var(--card-radius);
+  border: 1px solid var(--text-color-10);
+}

@@ -1,7 +1,6 @@
 .table-wrapper {
   height: 100%;
   max-height: 80vh;
-  max-width: 60vw;
   display: flex;
   flex-direction: column;
   padding: var(--card-padding);
@@ -9,12 +8,6 @@
   box-sizing: border-box;
   background: linear-gradient(-125deg, var(--card-color), var(--card-color), rgba(35, 180, 163, 0.2), rgba(35, 180, 163, 0.5));
   border-radius: var(--card-radius);
-}
-
-.title p {
-  font-size: 14px;
-  opacity: 0.5;
-  margin-top: 8px;
 }
 
 .table-container {
@@ -61,6 +54,10 @@ tbody tr {
   table-layout: fixed;
   transition: background 0.2s ease;
   cursor: pointer;
+
+  &.selected {
+    background: var(--primary-color-10);
+  }
 
   &:hover {
     background: var(--text-color-5);
