@@ -111,7 +111,7 @@ pub async fn clear_handler(Path(pid): Path<u32>) -> impl IntoResponse {
     let r = tokio::task::spawn_blocking(move || clear_working_set(pid)).await;
 
     match r {
-        Ok(Ok((json, before_size))) => {
+        Ok(Ok((json, _))) => {
             let msg = format!("Working set do processo {} limpo com sucesso!", pid);
             println!("{}", msg);
             Json(json!({
