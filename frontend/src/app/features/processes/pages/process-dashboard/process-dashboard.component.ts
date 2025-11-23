@@ -4,7 +4,7 @@ import {
   ProcessDetailsComponent,
   ProcessTableComponent,
 } from '../../components';
-import { MetricsStore } from '../../state';
+import { MetricsStore, ProcessesStore } from '../../state';
 import { TabsComponent } from '@shared/components';
 import { CommonModule } from '@angular/common';
 
@@ -24,11 +24,11 @@ import { CommonModule } from '@angular/common';
 export class ProcessDashboardComponent {
   tabs = [
     { label: "Processos", icon: "table" },
-    { label: "Heurística", icon: "settings" }
+    { label: "Limpeza Automática", icon: "bolt" }
   ];
   selectedTab = signal(0);
 
-  constructor(public store: MetricsStore) {}
+  constructor(public store: MetricsStore, public processesStore: ProcessesStore) {}
 
   selectTab(index: number) {
     this.selectedTab.set(index);

@@ -18,6 +18,18 @@
             <span class="label">Page Fault</span>
             <span>{{ proc.page_fault_count }}</span>
         </div>
+        <div class="row-between">
+            <span class="label">Pages</span>
+            <span>{{ proc.pages }}</span>
+        </div>
+        <div class="row-between">
+            <span class="label">Private Pages</span>
+            <span>{{ proc.private_usage | number }} KB</span>
+        </div>
+        <div class="row-between">
+            <span class="label">Threads</span>
+            <span>{{ proc.thread_count }}</span>
+        </div>
     </div>
 
     <app-process-chart/>
@@ -28,7 +40,7 @@
             Encerrar
         </button>
         <button class="btn-filled" (click)="onClearWorkingSet(proc.pid)">
-            <span class="material-symbols-outlined">delete</span>
+            <span class="material-symbols-outlined">mop</span>
             Limpar working set
         </button>
     </div>

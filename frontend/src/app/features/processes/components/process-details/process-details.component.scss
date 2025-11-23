@@ -1,8 +1,10 @@
 .process-details {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 12px;
   min-width: 400px;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .row-between {

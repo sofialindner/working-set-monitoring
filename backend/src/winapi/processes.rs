@@ -16,11 +16,12 @@ use windows_sys::Win32::{
             GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS, PROCESS_MEMORY_COUNTERS_EX,
         },
         SystemInformation::{GetSystemInfo, SYSTEM_INFO},
-        Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_SET_QUOTA, PROCESS_VM_READ, TerminateProcess, PROCESS_TERMINATE},
+        Threading::{
+            OpenProcess, TerminateProcess, PROCESS_QUERY_INFORMATION, PROCESS_SET_QUOTA,
+            PROCESS_TERMINATE, PROCESS_VM_READ,
+        },
     },
 };
-
-
 
 unsafe fn get_page_size() -> usize {
     let mut s: MaybeUninit<SYSTEM_INFO> = MaybeUninit::uninit();
@@ -29,10 +30,13 @@ unsafe fn get_page_size() -> usize {
     s.dwPageSize as usize
 }
 
-unsafe fn get_processes(page_size: usize) -> Result<ProcessList, String> {
+unsafe fn get_processes(
+    page_size: usize,
+    total_cleaned: usize,
+) -> Result<ProcessList, String> {
     let mut list = Vec::new();
     let mut index = 0;
-    let mut thread_total: u32= 0;
+    let mut thread_total: u32 = 0;
     let mut working_set_sizes_kb_total: usize = 0;
 
     let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -96,15 +100,15 @@ unsafe fn get_processes(page_size: usize) -> Result<ProcessList, String> {
     }
     CloseHandle(snapshot);
 
-    let working_set_sizes_gb_total =
-    working_set_sizes_kb_total as f64 / (1024.0 * 1024.0);
+    let working_set_sizes_gb_total = working_set_sizes_kb_total as f64 / (1024.0 * 1024.0);
 
     Ok(ProcessList {
         total: list.len(),
         processes: list,
-        thread_total, 
+        thread_total,
         working_set_sizes_kb_total,
-        working_set_sizes_gb_total
+        working_set_sizes_gb_total,
+        total_cleaned: total_cleaned / 1024,
     })
 }
 
@@ -112,7 +116,11 @@ pub unsafe fn terminate_process(pid: u32) -> Result<(), String> {
     let h = OpenProcess(PROCESS_TERMINATE, 0, pid);
 
     if h.is_null() {
-        return Err(format!("Falha ao abrir processo {}: {}", pid, std::io::Error::last_os_error()));
+        return Err(format!(
+            "Falha ao abrir processo {}: {}",
+            pid,
+            std::io::Error::last_os_error()
+        ));
     }
 
     let ok = TerminateProcess(h, 1);
@@ -129,10 +137,10 @@ pub unsafe fn terminate_process(pid: u32) -> Result<(), String> {
     Ok(())
 }
 
-pub fn collect_process_json() -> Result<String, String> {
+pub fn collect_process_json(total_cleaned: usize) -> Result<String, String> {
     unsafe {
         let page = get_page_size();
-        let list = get_processes(page)?;
+        let list = get_processes(page, total_cleaned)?;
         serde_json::to_string(&list).map_err(|e| e.to_string())
     }
 }

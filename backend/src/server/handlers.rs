@@ -5,6 +5,7 @@ use crate::ProcessList;
 use crate::WsCommand;
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
 use axum::{extract::Path, response::IntoResponse, Json};
+use chrono::Local;
 use futures::lock::Mutex;
 use serde_json::json;
 use std::sync::Arc;
@@ -17,6 +18,7 @@ pub async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
 
 pub async fn handle_ws(mut socket: WebSocket, limit: Arc<Mutex<Option<usize>>>) {
     let mut interval = time::interval(Duration::from_secs(1));
+    let mut total_cleaned: usize = 0;
 
     loop {
         tokio::select! {
@@ -32,7 +34,8 @@ pub async fn handle_ws(mut socket: WebSocket, limit: Arc<Mutex<Option<usize>>>) 
             }
 
             _ = interval.tick() => {
-                let json = tokio::task::spawn_blocking(|| collect_process_json())
+                let cleaned = total_cleaned.clone();
+                let json = tokio::task::spawn_blocking(move || collect_process_json(cleaned))
                     .await
                     .unwrap_or_else(|e| Err(format!("join error: {}", e)))
                     .unwrap_or_else(|e| format!(r#"{{"error":"{}"}}"#, e));
@@ -40,30 +43,58 @@ pub async fn handle_ws(mut socket: WebSocket, limit: Arc<Mutex<Option<usize>>>) 
                 let parsed = serde_json::from_str::<ProcessList>(&json);
                 let mut logs: Vec<serde_json::Value> = Vec::new();
 
-                if let Ok(process_list) = parsed {
-                    let limit_kb = *limit.lock().await;
+            if let Ok(process_list) = parsed {
+                let limit_kb = *limit.lock().await;
 
-                    if let Some(max_kb) = limit_kb {
-                        for p in &process_list.processes {
-                            if p.working_set_size > max_kb {
-                                let msg = format!(
-                                    "Processo {} (PID {}) excedeu limite: {} KB > {} KB. Limpando...",
-                                    p.name, p.pid, p.working_set_size, max_kb
-                                );
+                if let Some(max_kb) = limit_kb {
+                    for p in &process_list.processes {
+                        if p.working_set_size > max_kb {
 
-                                println!("{}", msg);
+                            let msg = format!(
+                                "[PID {}] {} - Limite excedido. {} KB > {} KB. Limpando...",
+                                p.pid, p.name, p.working_set_size, max_kb
+                            );
 
-                                logs.push(serde_json::json!({
-                                    "type": "info",
-                                    "message": msg
-                                }));
+                            println!("{}", msg);
 
-                                let pid = p.pid;
-                                tokio::task::spawn_blocking(move || clear_working_set(pid));
+                            // log informativo
+                            logs.push(serde_json::json!({
+                                "type": "info",
+                                "timestamp": format!("{}", Local::now().format("%H:%M:%S")),
+                                "message": msg
+                            }));
+
+                            let pid = p.pid;
+
+                            // roda a limpeza e captura o RESULTADO
+                            let result = tokio::task::spawn_blocking(move || clear_working_set(pid))
+                                .await
+                                .map_err(|e| format!("Erro no join: {}", e))
+                                .and_then(|r| r);
+
+                            match result {
+                                Ok((json_str, before_size)) => {
+                                    total_cleaned += before_size;
+
+                                    logs.push(serde_json::json!({
+                                        "type": "success",
+                                        "timestamp": format!("{}", Local::now().format("%H:%M:%S")),
+                                        "message": format!("[PID {}] {} - Limpeza concluída. {}", p.pid, p.name, json_str)
+                                    }));
+                                }
+                                Err(err_msg) => {
+                                    logs.push(serde_json::json!({
+                                        "type": "error",
+                                        "timestamp": format!("{}", Local::now().format("%H:%M:%S")),
+                                        "message": err_msg
+                                    }));
+                                }
                             }
                         }
                     }
                 }
+            }
+
 
                 let mut value: serde_json::Value =
                     serde_json::from_str(&json).unwrap_or_else(|_| serde_json::json!({}));
@@ -81,26 +112,24 @@ pub async fn handle_ws(mut socket: WebSocket, limit: Arc<Mutex<Option<usize>>>) 
     }
 }
 
-
-
 pub async fn clear_handler(Path(pid): Path<u32>) -> impl IntoResponse {
     let r = tokio::task::spawn_blocking(move || clear_working_set(pid)).await;
 
     match r {
-        Ok(Ok(json)) => {
-            let msg = format!("Working set do processo {} limpo com sucesso!", pid);
+        Ok(Ok((json, _))) => {
+            let msg = format!("Working set do processo [PID {}] limpo com sucesso!", pid);
             println!("{}", msg);
             Json(json!({
-                "status": "success",
+                "type": "success",
                 "text": msg,
                 "data": json
             }))
         }
         Ok(Err(e)) => {
-            let msg = format!("Falha ao limpar working set do processo {}.", pid);
+            let msg = format!("Falha ao limpar working set do processo [PID {}].", pid);
             println!("{}", msg);
             Json(json!({
-                "status": "error",
+                "type": "error",
                 "error": e,
                 "text": msg
             }))
@@ -109,7 +138,7 @@ pub async fn clear_handler(Path(pid): Path<u32>) -> impl IntoResponse {
             let msg = "Erro interno ao aguardar task.".to_string();
             println!("{}", msg);
             Json(json!({
-                "status": "error",
+                "type": "error",
                 "error": format!("join: {}", e),
                 "text": msg
             }))
@@ -117,24 +146,23 @@ pub async fn clear_handler(Path(pid): Path<u32>) -> impl IntoResponse {
     }
 }
 
-
 pub async fn terminate_handler(Path(pid): Path<u32>) -> impl IntoResponse {
     let r = tokio::task::spawn_blocking(move || unsafe { terminate_process(pid) }).await;
 
     match r {
         Ok(Ok(())) => {
-            let msg: String = String::from(format!("Processo {} encerrado com sucesso!", pid));
+            let msg: String = String::from(format!("Processo [PID {}] encerrado com sucesso!", pid));
             println!("{}", msg);
             Json(json!({
-                "status": "success",
+                "type": "success",
                 "text": msg
             }))
         }
         Ok(Err(e)) => {
-            let msg: String = String::from(format!("Falha ao encerrar o processo {}.", pid));
+            let msg: String = String::from(format!("Falha ao encerrar o processo [PID {}].", pid));
             println!("{}", msg);
             Json(json!({
-                "status": "error",
+                "type": "error",
                 "error": e,
                 "text": msg
             }))
@@ -143,7 +171,7 @@ pub async fn terminate_handler(Path(pid): Path<u32>) -> impl IntoResponse {
             let msg: String = String::from("Erro interno ao aguardar task.");
             println!("{}", msg);
             Json(json!({
-                "status": "error",
+                "type": "error",
                 "error": format!("join: {}", e),
                 "text": msg
             }))

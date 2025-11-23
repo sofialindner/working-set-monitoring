@@ -1,13 +1,13 @@
 <div class="page-container">
   <div class="totals-wrapper">
     <div class="card">
-      <h3>Total Working Set</h3>
+      <h3>Total Working Sets</h3>
       <div class="counter">
-        <span class="counter__value">{{ store.totalWorkingSetSize() }}</span>
-        <span class="counter__unit">KB</span>
+        <span class="counter__value">{{ store.totalWorkingSetSizeGB() | number }}</span>
+        <span class="counter__unit">GB</span>
       </div>
     </div>
-    <div class="card">
+    <div class="card" [style.color]="'var(--primary-color)'" [style.background]="'var(--primary-color-20)'">
       <h3>Total de Processos</h3>
       <div class="counter">
         <span class="counter__value">{{ store.totalProcesses() }}</span>
@@ -15,10 +15,24 @@
       </div>
     </div>
     <div class="card">
+      <h3>😋 Mais Guloso (PID)</h3>
+      <div class="counter">
+        <span class="counter__value">{{ processesStore.greedyProcess()?.pid }}</span>
+        <span class="counter__unit">{{ processesStore.greedyProcess()?.name }}</span>
+      </div>
+    </div>
+    <div class="card">
       <h3>Total de Threads</h3>
       <div class="counter">
         <span class="counter__value">{{ store.totalThreads() }}</span>
         <span class="counter__unit">threads</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>⚡ Limpeza Automática</h3>
+      <div class="counter">
+        <span class="counter__value">{{ store.totalCleaned() }}</span>
+        <span class="counter__unit">MB</span>
       </div>
     </div>
   </div>

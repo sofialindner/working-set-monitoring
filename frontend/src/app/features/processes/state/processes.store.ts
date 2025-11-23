@@ -24,6 +24,15 @@ export class ProcessesStore {
     return this._processMetrics().get(pid) ?? [];
   });
 
+  greedyProcess = computed(() => {
+    const list = this._processes();
+    if (!list.length) return null;
+
+    return list.reduce((max, p) =>
+      p.working_set_size > max.working_set_size ? p : max
+    );
+  });
+
   constructor(ws: WebSocketService) {
     effect(() => {
       const message = ws.message();

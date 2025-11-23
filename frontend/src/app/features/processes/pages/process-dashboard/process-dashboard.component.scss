@@ -4,6 +4,8 @@
   align-items: center;
   padding-top: 16px;
   width: 80vw;
+  height: 100%;
+  gap: 16px;
 }
 
 .totals-wrapper {
@@ -15,13 +17,14 @@
     width: 100%;
 
     &:first-child {
-      background: linear-gradient(to bottom right, var(--secondary-color), var(--card-color));
+      background: linear-gradient(160deg, var(--secondary-color) 0%, var(--card-color) 90%);
     }
   }
 
   .counter {
     display: flex;
     align-items: flex-end;
+    color: inherit;
     gap: 4px;
 
     &__value {
@@ -40,10 +43,13 @@
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 8px;
+    color: inherit;
   }
 }
 
 .process-view {
   display: flex;
   gap: 16px;
+  max-height: 65vh;
+  overflow: hidden;
 }

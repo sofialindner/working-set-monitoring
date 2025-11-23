@@ -20,16 +20,16 @@ export class ProcessDetailsComponent {
   ) {}
 
   onTerminateProcess(pid: number) {
-    this.processService.terminateProcess(pid).subscribe((response: any) => {
-      //this.notifications.push(response.text, response.type);
-      this.notifications.push(response.status);
+    this.processService.terminateProcess(pid).subscribe((response: AppNotification) => {
+      console.log(response)
+      this.notifications.push(response.text, response.type);
     });
   }
 
   onClearWorkingSet(pid: number) {
-    this.processService.clearWorkingSet(pid).subscribe((response: any) => {
-      //this.notifications.push(response.text, response.type);
-      this.notifications.push(response.status);
+    this.processService.clearWorkingSet(pid).subscribe((response: AppNotification) => {
+      console.log(response)
+      this.notifications.push(response.text, response.type);
     });
   }
 }

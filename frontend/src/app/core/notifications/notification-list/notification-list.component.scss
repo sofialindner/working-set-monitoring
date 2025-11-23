@@ -13,6 +13,7 @@
   border-radius: 8px;
   color: var(--text-color);
   font-size: 14px;
+  font-weight: 500;
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
   max-width: 280px;
   word-wrap: break-word;
@@ -20,9 +21,9 @@
 
 }
 
-.notification.success { background: #2ecc71; }
-.notification.error   { background: #e74c3c; }
-.notification.info    { background: #3498db; }
+.notification.success { background: #1eb65d; }
+.notification.error   { background: #e33841; }
+.notification.info    { background: #10a9a9; }
 
 @keyframes slide-in {
   from {

@@ -1,7 +1,7 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 }
 
 .field {
@@ -10,7 +10,7 @@
 }
 
 input {
-  max-width: 20rem;
+  max-width: 15rem;
 }
 
 button {
@@ -18,9 +18,24 @@ button {
 }
 
 .console {
-  font-family: 'Ubuntu Mono', sans-serif;
+  flex: 1;
+  overflow-y: auto;
+  height: 30vh;
   background: var(--bg-color);
   padding: var(--card-padding);
   border-radius: var(--card-radius);
   border: 1px solid var(--text-color-10);
+
+  .log {
+    display: flex;
+    gap: 30px;
+    padding-block: 4px;
+    font-family: 'Ubuntu Mono', monospace;
+
+    * { font-family: inherit }
+
+    &__type {
+      width: 70px;
+    }
+  }
 }

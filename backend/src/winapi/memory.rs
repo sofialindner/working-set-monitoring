@@ -3,9 +3,7 @@ use windows_sys::Win32::{
     Foundation::{CloseHandle, HANDLE},
     System::{
         ProcessStatus::{
-            GetProcessMemoryInfo,
-            PROCESS_MEMORY_COUNTERS,
-            PROCESS_MEMORY_COUNTERS_EX
+            GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS, PROCESS_MEMORY_COUNTERS_EX,
         },
         Threading::{OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_SET_QUOTA},
     },
@@ -21,8 +19,7 @@ extern "system" {
     ) -> i32;
 }
 
-
-pub fn clear_working_set(pid: u32) -> Result<String, String> {
+pub fn clear_working_set(pid: u32) -> Result<(String, usize), String> {
     unsafe {
         let h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_SET_QUOTA, 0, pid);
         if h.is_null() {
@@ -47,18 +44,13 @@ pub fn clear_working_set(pid: u32) -> Result<String, String> {
 
         CloseHandle(h);
 
-        Ok(serde_json::json!({
-            "pid": pid,
-            "success": ok,
-            "before": {
-                "working_set_kb": before.WorkingSetSize / 1024,
-                "private_kb": before.PrivateUsage / 1024
-            },
-            "after": {
-                "working_set_kb": after.WorkingSetSize / 1024,
-                "private_kb": after.PrivateUsage / 1024
-            }
-        })
-        .to_string())
+        if ok {
+            return Ok((format!("Antes: {} KB | Depois: {} KB", before.WorkingSetSize / 1024, after.WorkingSetSize / 1024),
+                before.WorkingSetSize / 1024,
+            ))
+        }
+
+        Err(format!("[PID {}]: Não foi possível limpar a working set.", pid))
     }
 }
+

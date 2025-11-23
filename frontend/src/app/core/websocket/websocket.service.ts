@@ -19,7 +19,7 @@ export class WebSocketService {
     };
   }
 
-  send(action: any) {
-    this.socket?.send(JSON.stringify(action));
+  send(message: any) {
+    this.socket?.send(JSON.stringify(message));
   }
 }

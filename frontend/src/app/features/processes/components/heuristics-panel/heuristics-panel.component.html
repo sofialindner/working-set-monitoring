@@ -1,36 +1,51 @@
 <div class="card">
   <div class="title-support-text">
-    <h2>Limpeza Automática de Working Set</h2>
+    <h2>Limpeza Automática</h2>
     <p>
       Permite aplicar métricas para reduzir o espaço ocupado por working sets na
       memória RAM.
     </p>
   </div>
-  <hr>
 
-  <form>
-    <label for="maxWorkingSetSize"> Tamanho máximo de working set (KB) </label>
+  <div>
+    <label for="maxWorkingSetSize">Tamanho máximo de Working Set (KB)</label>
     <div class="field">
       <input
+        [ngModel]="limitInput"
+        (ngModelChange)="updateLimit($event)"
         name="maxWorkingSetSize"
-        placeholder="Digite o tamanho limite em KB. Ex: 2000"
+        placeholder="Digite um tamanho inteiro..."
         type="text"
         mask="0*"
+        max="999999"
       />
-      <button class="btn-filled">Aplicar</button>
+      <button class="btn-filled" (click)="onSetWorkingSetLimit()">
+        Aplicar
+      </button>
     </div>
-  </form>
+  </div>
 
   <div>
     <h3 class="title">
-    <span class="material-symbols-outlined">terminal</span>
-        Terminal
+      <span class="material-symbols-outlined">terminal</span>
+      Console
     </h3>
-    <div class="console">
-        <div *ngFor="let log of store.consoleLogs()">
-            <span class="log-type">{{ log.type.toUpperCase() }}:</span>
-            <span>{{ log.message }}</span>
+
+    <div class="console" #consoleContainer>
+      <ng-container *ngIf="store.consoleLogs().length === 0; else logs">
+        <div class="log">Aguardando notificações...</div>
+      </ng-container>
+
+      <ng-template #logs>
+        <div class="log" *ngFor="let log of store.consoleLogs()">
+          <div class="log__type" [style.color]="getLogTypeColor(log.type)">
+            {{ log.type.toUpperCase() }}:
+          </div>
+          <div class="log__timestamp">{{ log.timestamp }}</div>
+          <div class="log__message">{{ log.message }}</div>
         </div>
+        <div #anchor></div>
+      </ng-template>
     </div>
   </div>
 </div>

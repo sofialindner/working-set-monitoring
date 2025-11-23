@@ -20,7 +20,7 @@ export class NotificationService {
       type,
       createdAt: new Date()
     };
-
+    
     this._list.update(list => [...list, notification]);
 
     setTimeout(() => this.remove(notification.id), 5000);
