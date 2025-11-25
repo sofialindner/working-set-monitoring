@@ -73,8 +73,8 @@ pub async fn handle_ws(mut socket: WebSocket, limit: Arc<Mutex<Option<usize>>>) 
                                 .and_then(|r| r);
 
                             match result {
-                                Ok((json_str, before_size)) => {
-                                    total_cleaned += before_size;
+                                Ok((json_str, proc_cleaned)) => {
+                                    total_cleaned += proc_cleaned;
 
                                     logs.push(serde_json::json!({
                                         "type": "success",

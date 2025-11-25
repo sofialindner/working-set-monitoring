@@ -13,7 +13,7 @@ use windows_sys::Win32::{
             TH32CS_SNAPPROCESS,
         },
         ProcessStatus::{
-            GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS, PROCESS_MEMORY_COUNTERS_EX,
+            GetProcessMemoryInfo, PROCESS_MEMORY_COUNTERS, PROCESS_MEMORY_COUNTERS_EX2
         },
         SystemInformation::{GetSystemInfo, SYSTEM_INFO},
         Threading::{
@@ -66,11 +66,11 @@ unsafe fn get_processes(
         );
 
         if !h.is_null() {
-            let mut mem: PROCESS_MEMORY_COUNTERS_EX = zeroed();
+            let mut mem: PROCESS_MEMORY_COUNTERS_EX2 = zeroed();
             if GetProcessMemoryInfo(
                 h,
                 &mut mem as *mut _ as *mut PROCESS_MEMORY_COUNTERS,
-                size_of::<PROCESS_MEMORY_COUNTERS_EX>() as u32,
+                size_of::<PROCESS_MEMORY_COUNTERS_EX2>() as u32,
             ) != 0
             {
                 let working_set_size_kb = mem.WorkingSetSize / 1024;
@@ -79,7 +79,7 @@ unsafe fn get_processes(
                     index,
                     name,
                     working_set_size: working_set_size_kb,
-                    private_usage: mem.PrivateUsage / 1024,
+                    private_usage: mem.PrivateWorkingSetSize / 1024,
                     peak_working_set_size: mem.PeakWorkingSetSize / 1024,
                     pages: mem.WorkingSetSize as usize / page_size,
                     page_fault_count: mem.PageFaultCount,

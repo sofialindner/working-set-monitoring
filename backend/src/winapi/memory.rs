@@ -44,13 +44,22 @@ pub fn clear_working_set(pid: u32) -> Result<(String, usize), String> {
 
         CloseHandle(h);
 
+        let total_cleaned = before.WorkingSetSize - after.WorkingSetSize;
+
         if ok {
-            return Ok((format!("Antes: {} KB | Depois: {} KB", before.WorkingSetSize / 1024, after.WorkingSetSize / 1024),
-                before.WorkingSetSize / 1024,
-            ))
+            return Ok((
+                format!(
+                    "Antes: {} KB | Depois: {} KB",
+                    before.WorkingSetSize / 1024,
+                    after.WorkingSetSize / 1024
+                ),
+                total_cleaned / 1024,
+            ));
         }
 
-        Err(format!("[PID {}]: Não foi possível limpar a working set.", pid))
+        Err(format!(
+            "[PID {}]: Não foi possível limpar a working set.",
+            pid
+        ))
     }
 }
-
