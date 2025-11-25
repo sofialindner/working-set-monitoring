@@ -57,7 +57,6 @@ pub async fn handle_ws(mut socket: WebSocket, limit: Arc<Mutex<Option<usize>>>) 
 
                             println!("{}", msg);
 
-                            // log informativo
                             logs.push(serde_json::json!({
                                 "type": "info",
                                 "timestamp": format!("{}", Local::now().format("%H:%M:%S")),
@@ -66,7 +65,6 @@ pub async fn handle_ws(mut socket: WebSocket, limit: Arc<Mutex<Option<usize>>>) 
 
                             let pid = p.pid;
 
-                            // roda a limpeza e captura o RESULTADO
                             let result = tokio::task::spawn_blocking(move || clear_working_set(pid))
                                 .await
                                 .map_err(|e| format!("Erro no join: {}", e))
@@ -103,7 +101,6 @@ pub async fn handle_ws(mut socket: WebSocket, limit: Arc<Mutex<Option<usize>>>) 
 
                 let final_json = value.to_string();
 
-                // <-- aqui: converte String -> Utf8Bytes via Into
                 if socket.send(Message::Text(final_json.into())).await.is_err() {
                     break;
                 }
